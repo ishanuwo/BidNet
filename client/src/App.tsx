@@ -1,35 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from 'react';
+import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
+import HomePage from './Components/HomePage';
+import AuctionList from './Components/AuctionList';
+import AuctionDetail from './Components/AuctionDetail';
+import CreateAuction from './Components/CreateAuction';
+import Profile from './Components/Profile';
+import Login from './Components/Login';
+import NotFound from './Components/NotFound';
+import './App.css';
 
-function App() {
-  const [count, setCount] = useState(0)
-
+const App: React.FC = () => {
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
-}
+    <Router>
+      <header className="main-header">
+        <div className="header-container">
+          <div className="logo">
+            <Link to="/">BidNet</Link>
+          </div>
+          <nav className="main-nav">
+            <ul>
+              <li><Link to="/" className="nav-link">Home</Link></li>
+              <li><Link to="/auctions" className="nav-link">Auctions</Link></li>
+              <li><Link to="/create-auction" className="nav-link">Create Auction</Link></li>
+              <li><Link to="/profile" className="nav-link">Profile</Link></li>
+              <li><Link to="/login" className="nav-link">Login</Link></li>
+            </ul>
+          </nav>
+        </div>
+      </header>
+      <main id="root">
+        <Routes>
+          <Route path="/" element={<HomePage />} />
+          <Route path="/auctions" element={<AuctionList />} />
+          <Route path="/auction/:id" element={<AuctionDetail />} />
+          <Route path="/create-auction" element={<CreateAuction />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </main>
+      <footer className="main-footer">
+        <p>&copy; {new Date().getFullYear()} BidNet. All rights reserved.</p>
+      </footer>
+    </Router>
+  );
+};
 
-export default App
+export default App;
