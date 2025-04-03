@@ -212,32 +212,6 @@ int main() {
         }
     });
 
-    CROW_ROUTE(app, "/mark_item_sold/<string>").methods("POST"_method)([](const crow::request& req, const std::string& id) {
-        try {
-            pqxx::work txn(*db.getConnection());
-
-            // Query to check if the item exists
-            std::string query_check = "SELECT id FROM items WHERE id = $1";
-            pqxx::result res_check = txn.exec_params(query_check, id);
-
-            // Check if the item exists
-            if (res_check.empty()) {
-                return crow::response(404, "Item not found");
-            }
-
-            // Query to update the status of the item to 'sold'
-            std::string query_update = "UPDATE items SET status = 'sold' WHERE id = $1";
-            txn.exec_params(query_update, id); // Execute the update query
-
-            txn.commit();
-
-            // Return a success message
-            return crow::response(200, "Item marked as sold");
-        } catch (const std::exception& e) {
-            return crow::response(500, "Error: " + std::string(e.what()));
-        }
-    });
-
     CROW_ROUTE(app, "/get_auction_details/<string>").methods("GET"_method)([](const crow::request& req, const std::string& id) {
         try {
             pqxx::work txn(*db.getConnection());
@@ -415,6 +389,56 @@ int main() {
         CROW_ROUTE(app, "/")([](){
         return "Hit from Crow!";
     });
+
+    CROW_ROUTE(app, "/complete_transaction/<int>").methods("POST"_method)([](const crow::request& req, const int item_id) {
+        try {
+            pqxx::work txn(*db.getConnection());
+    
+            // Query to get the highest bid for the given item_id
+            std::string query = "SELECT user_id, bid_amount, seller_id FROM bids WHERE item_id = $1 ORDER BY bid_amount DESC LIMIT 1";
+            pqxx::result res = txn.exec_params(query, item_id);
+    
+            if (res.empty()) {
+                return crow::response(404, "No bids found for the item");
+            }
+    
+            // Get buyer_id and highest bid amount
+            int buyer_id = res[0]["user_id"].as<int>();
+            double bid_amount = res[0]["bid_amount"].as<double>();
+            int seller_id = res[0]["seller_id"].as<int>();
+    
+            // Create a new transaction entry in the transactions table
+            std::string transaction_query = "INSERT INTO transactions (item_id, buyer_id, seller_id, final_price, transaction_time) "
+                                           "VALUES ($1, $2, $3, $4, NOW()) RETURNING id";
+            pqxx::result transaction_res = txn.exec_params(transaction_query, item_id, buyer_id, seller_id, bid_amount);
+    
+            if (transaction_res.empty()) {
+                return crow::response(500, "Failed to create transaction");
+            }
+    
+            int transaction_id = transaction_res[0]["id"].as<int>();
+
+            std::string update_item_query = "UPDATE items SET status = 'sold' WHERE id = $1";
+            txn.exec_params(update_item_query, item_id);
+    
+            txn.commit();
+    
+            // Return the details of the completed transaction
+            crow::json::wvalue response_data;
+            response_data["transaction_id"] = transaction_id;
+            response_data["item_id"] = item_id;
+            response_data["buyer_id"] = buyer_id;
+            response_data["seller_id"] = seller_id;
+            response_data["final_price"] = bid_amount;
+            response_data["transaction_time"] = "current time";
+    
+            return crow::response(200, response_data);
+    
+        } catch (const std::exception& e) {
+            // Handle any errors that occur
+            return crow::response(500, "Error: " + std::string(e.what()));
+        }
+    });    
 
     app.port(8080).run();
 
