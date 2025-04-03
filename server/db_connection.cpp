@@ -37,3 +37,10 @@ Database::~Database() {
 bool Database::isConnected() {
     return conn && conn->is_open();
 }
+pqxx::connection* Database::getConnection() {
+    return conn.get();
+}
+pqxx::result Database::exec(const std::string& query) {
+    pqxx::work txn(*conn);
+    return txn.exec(query);
+}
