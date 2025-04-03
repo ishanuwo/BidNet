@@ -86,8 +86,6 @@ int main() {
         }
     });
     
-    
-
     CROW_ROUTE(app, "/edit_user").methods("PUT"_method)([](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body) {
@@ -144,6 +142,7 @@ int main() {
             return crow::response(500, "Error: " + std::string(e.what()));
         }
     });
+
     CROW_ROUTE(app, "/get_all_items").methods("GET"_method)([](const crow::request& req) {
         try {
             pqxx::work txn(*db.getConnection());
@@ -180,8 +179,7 @@ int main() {
         }
     });
 
-    CROW_ROUTE(app, "/get_item_details/<string>") // Define the route with a dynamic 'id' parameter
-    .methods("GET"_method)([](const crow::request& req, const std::string& id) {
+    CROW_ROUTE(app, "/get_item_details/<string>").methods("GET"_method)([](const crow::request& req, const std::string& id) {
         try {
             pqxx::work txn(*db.getConnection());
 
@@ -214,8 +212,7 @@ int main() {
         }
     });
 
-    CROW_ROUTE(app, "/mark_item_sold/<string>") // Define the route with a dynamic 'id' parameter
-    .methods("POST"_method)([](const crow::request& req, const std::string& id) {
+    CROW_ROUTE(app, "/mark_item_sold/<string>").methods("POST"_method)([](const crow::request& req, const std::string& id) {
         try {
             pqxx::work txn(*db.getConnection());
 
@@ -241,9 +238,7 @@ int main() {
         }
     });
 
-
-    CROW_ROUTE(app, "/get_auction_details/<string>") // Define the route with a dynamic 'id' parameter
-    .methods("GET"_method)([](const crow::request& req, const std::string& id) {
+    CROW_ROUTE(app, "/get_auction_details/<string>").methods("GET"_method)([](const crow::request& req, const std::string& id) {
         try {
             pqxx::work txn(*db.getConnection());
 
@@ -275,8 +270,8 @@ int main() {
             return crow::response(500, "Error: " + std::string(e.what()));
         }
     });
-    CROW_ROUTE(app, "/place_bid")
-    .methods("POST"_method)([](const crow::request& req) {
+
+    CROW_ROUTE(app, "/place_bid").methods("POST"_method)([](const crow::request& req) {
         try {
             // Parse the JSON body
             auto bid_data = crow::json::load(req.body);
@@ -339,8 +334,7 @@ int main() {
         }
     });
 
-    CROW_ROUTE(app, "/get_transactions_for_buyer/<int>") // Define the route with a dynamic 'buyer_id' parameter
-    .methods("GET"_method)([](const crow::request& req, const int buyer_id) {
+    CROW_ROUTE(app, "/get_transactions_for_buyer/<int>").methods("GET"_method)([](const crow::request& req, const int buyer_id) {
         try {
             pqxx::work txn(*db.getConnection());
     
@@ -377,8 +371,7 @@ int main() {
         }
     });
 
-    CROW_ROUTE(app, "/get_transactions_for_seller/<int>") // Define the route with a dynamic 'seller_id' parameter
-        .methods("GET"_method)([](const crow::request& req, const int seller_id) {
+    CROW_ROUTE(app, "/get_transactions_for_seller/<int>").methods("GET"_method)([](const crow::request& req, const int seller_id) {
             try {
                 pqxx::work txn(*db.getConnection());
 
@@ -417,8 +410,9 @@ int main() {
 
     
 
-    // Basic test route
-    CROW_ROUTE(app, "/")([](){
+
+    
+        CROW_ROUTE(app, "/")([](){
         return "Hit from Crow!";
     });
 

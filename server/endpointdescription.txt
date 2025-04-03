@@ -1,0 +1,124 @@
+1. /register
+METHOD: POST
+DESCRIPTION: Registers a new user with a username, email, and password.
+TABLE: users
+RETURN:
+
+Success: 201 Created with a message User registered successfully.
+
+Failure: 400 Bad Request with an error message.
+
+2. /login
+METHOD: POST
+DESCRIPTION: Logs in a user by validating the username and password. Returns a user ID on successful login.
+TABLE: users
+RETURN:
+
+Success: 200 OK with user ID and authentication token.
+
+Failure: 401 Unauthorized with an error message.
+
+3. /edit_user
+METHOD: PUT
+DESCRIPTION: Updates a user's email and password based on the provided username.
+TABLE: users
+RETURN:
+
+Success: 200 OK with message User updated successfully.
+
+Failure: 400 Bad Request with an error message.
+
+4. /create_auction
+METHOD: POST
+DESCRIPTION: Creates a new auction item by a user with auction details like name, description, starting price, and duration.
+TABLE: items
+RETURN:
+
+Success: 201 Created with auction item details.
+
+Failure: 400 Bad Request with an error message.
+
+5. /get_all_items
+METHOD: GET
+DESCRIPTION: Retrieves all auction items, including basic information like name, description, starting price, and status.
+TABLE: items
+RETURN:
+
+Success: 200 OK with a list of auction items.
+
+Failure: 500 Internal Server Error with an error message.
+
+6. /get_item_details/<string>
+METHOD: GET
+DESCRIPTION: Retrieves detailed information about a specific auction item using its unique ID.
+TABLE: items
+RETURN:
+
+Success: 200 OK with auction item details.
+
+Failure: 404 Not Found with an error message if the item is not found.
+
+7. /mark_item_sold/<string>
+METHOD: POST
+DESCRIPTION: Marks an auction item as sold based on its unique ID.
+TABLE: items
+RETURN:
+
+Success: 200 OK with message Item marked as sold.
+
+Failure: 404 Not Found with an error message if the item is not found.
+
+8. /get_auction_details/<string>
+METHOD: GET
+DESCRIPTION: Retrieves detailed auction information for a specific item based on its unique ID.
+TABLE: items
+RETURN:
+
+Success: 200 OK with auction item details.
+
+Failure: 404 Not Found with an error message if the item is not found.
+
+9. /place_bid
+METHOD: POST
+DESCRIPTION: Allows a user to place a bid on an item, given valid bid data (user_id, item_id, bid_amount). Checks if the bid amount is higher than the current price.
+TABLE: bids, items
+RETURN:
+
+Success: 201 Created with bid details and updated auction item status.
+
+Failure:
+
+400 Bad Request if the bid amount is lower than the current price.
+
+404 Not Found if the item or user is not found.
+
+10. /get_transactions_for_buyer/<int>
+METHOD: GET
+DESCRIPTION: Retrieves all transactions where the given buyer_id matches the buyer in the transaction.
+TABLE: transactions
+RETURN:
+
+Success:
+
+200 OK with a JSON response containing an array of transaction details
+
+Failure:
+
+404 Not Found with a message No transactions found for the buyer.
+
+500 Internal Server Error with an error message if an exception occurs during the process.
+
+11. /get_transactions_for_seller/<int>
+METHOD: GET
+DESCRIPTION: Retrieves all transactions where the given seller_id matches the seller in the transaction.
+TABLE: transactions
+RETURN:
+
+Success:
+
+200 OK with a JSON response containing an array of transaction details:
+Failure:
+
+404 Not Found with a message No transactions found for the seller.
+
+500 Internal Server Error with an error message if an exception occurs during the process.
