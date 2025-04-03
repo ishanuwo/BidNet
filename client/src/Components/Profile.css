@@ -1,0 +1,55 @@
+/* Container for the entire profile page */
+.profile-container {
+    min-height: 100vh;
+    padding: 2rem;
+    background-color: #f8f9fa;
+  }
+  
+  /* Styling for the main header */
+  .profile-header {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #343a40;
+    margin-bottom: 1.5rem;
+  }
+  
+  /* Container for the content sections */
+  .content-container {
+    width: 100%;
+    max-width: 1200px;
+  }
+  
+  /* Section title styling */
+  .section-title {
+    font-size: 1.75rem;
+    border-bottom: 2px solid #dee2e6;
+    padding-bottom: 0.5rem;
+    margin-bottom: 1rem;
+    color: #495057;
+  }
+  
+  /* Styling for each card */
+  .profile-card {
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    margin-bottom: 1.5rem;
+    transition: transform 0.2s ease-in-out;
+  }
+  
+  /* Subtle hover effect for cards */
+  .profile-card:hover {
+    transform: translateY(-5px);
+  }
+  
+  /* Card title styling */
+  .card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Card text styling */
+  .card-text {
+    font-size: 1rem;
+    color: #6c757d;
+  }
+  
