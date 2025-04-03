@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useNavigate } from 'react-router-dom';
 import HomePage from './Components/HomePage';
 import AuctionList from './Components/AuctionList';
 import AuctionDetail from './Components/AuctionDetail';
@@ -12,6 +12,7 @@ import './App.css';
 
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -21,10 +22,10 @@ const App: React.FC = () => {
   const handleLogout = () => {
     localStorage.removeItem('user');
     setIsAuthenticated(false);
+    navigate('/');
   };
 
   return (
-    <Router>
       <div>
         <Navbar isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
         <div className="container mt-1">
@@ -42,7 +43,6 @@ const App: React.FC = () => {
           <p className="mb-0">© 2025 BidNet. All rights reserved.</p>
         </footer>
       </div>
-    </Router>
   );
 };
 
