@@ -1,22 +1,38 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import '../App.css';
+interface LoginProps {
+  setIsAuthenticated: (value: boolean) => void;
+}
 
-
-const Login: React.FC = () => {
+const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulated authentication logic
-    if (username && password) {
-      alert('Login successful!');
-      navigate('/');
-    } else {
-      alert('Please enter both username and password.');
+
+    try {
+      const response = await fetch('http://localhost:8080/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        localStorage.setItem('user', JSON.stringify({ username }));
+        localStorage.setItem('id', JSON.stringify({ id: data.id }));
+        setIsAuthenticated(true);
+        navigate('/');
+      } else {
+        alert(data.message || 'Login failed');
+      }
+    } catch (error) {
+      console.error('Error during login:', error);
+      alert('An error occurred while logging in.');
     }
   };
 
