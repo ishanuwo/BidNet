@@ -1,0 +1,37 @@
+POSTGRES ENTITIES
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    password_hash TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE items (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE, -- Owner of the item
+    name VARCHAR(100) NOT NULL,
+    description TEXT,
+    starting_price DECIMAL(10,2) NOT NULL,
+    current_price DECIMAL(10,2) DEFAULT 0.00,
+    bid_end_time TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE bids (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id) ON DELETE CASCADE,
+    item_id INT REFERENCES items(id) ON DELETE CASCADE,
+    bid_amount DECIMAL(10,2) NOT NULL,
+    bid_time TIMESTAMP DEFAULT NOW(),
+    CONSTRAINT unique_bid UNIQUE (user_id, item_id, bid_amount) -- Ensures no duplicate bid amounts from the same user on the same item
+);
+
+CREATE TABLE transactions (
+    id SERIAL PRIMARY KEY,
+    item_id INT REFERENCES items(id) ON DELETE CASCADE,
+    buyer_id INT REFERENCES users(id) ON DELETE SET NULL,
+    final_price DECIMAL(10,2) NOT NULL,
+    transaction_time TIMESTAMP DEFAULT NOW()
+);
