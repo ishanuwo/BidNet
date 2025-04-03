@@ -1,4 +1,6 @@
 import React, { useState, FormEvent } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../modules/CreateAuction.css';
 
@@ -8,25 +10,15 @@ const CreateAuction: React.FC = () => {
   const [itemName, setItemName] = useState('');
   const [description, setDescription] = useState('');
   const [startPrice, setStartPrice] = useState('');
-  const [duration, setDuration] = useState(0); 
+  const [endDate, setEndDate] = useState<Date | null>(null);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!itemName || !description || !startPrice) {
+    if (!itemName || !description || !startPrice || !endDate) {
       setErrorMessage('Please fill in all required fields.');
-      setSuccessMessage(null);
-      return;
-    }
-
-    if (isNaN(duration)) {
-      setErrorMessage('Duration must be a number');
-      setSuccessMessage(null);
-      return;
-    } else if (duration <= 0) {
-      setErrorMessage('Duration must be a positive number');
       setSuccessMessage(null);
       return;
     }
@@ -38,12 +30,23 @@ const CreateAuction: React.FC = () => {
       return;
     }
 
+    const currentTime = new Date().getTime();
+    const endTime = endDate.getTime();
+
+    if (endTime <= currentTime) {
+      setErrorMessage('End date must be in the future.');
+      setSuccessMessage(null);
+      return;
+    }
+
+    const durationInSeconds = Math.floor((endTime - currentTime) / 1000);
+
     const data = {
       user_id: localStorage.getItem('id'),
       name: itemName,
       description,
       starting_price: numericPrice,
-      duration: duration, 
+      duration: durationInSeconds,
     };
 
     try {
@@ -57,6 +60,7 @@ const CreateAuction: React.FC = () => {
 
       if (!res.ok) {
         const errorText = await res.text();
+        console.log(data);
         throw new Error(`Error creating auction: ${errorText}`);
       }
 
@@ -65,7 +69,7 @@ const CreateAuction: React.FC = () => {
       setItemName('');
       setDescription('');
       setStartPrice('');
-      setDuration(0); 
+      setEndDate(null);
     } catch (err: any) {
       setErrorMessage(err.message);
       setSuccessMessage(null);
@@ -86,7 +90,7 @@ const CreateAuction: React.FC = () => {
         {successMessage && (
           <div className="success-message">
             {successMessage}
-        </div>
+          </div>
         )}
 
         <form onSubmit={handleSubmit}>
@@ -120,13 +124,15 @@ const CreateAuction: React.FC = () => {
             />
           </div>
           <div className="mb-3">
-            <label className="form-label">Add Duration</label>
-            <input
-              type="number"
+            <label className="form-label">End Date & Time</label>
+            <DatePicker
+              selected={endDate}
+              onChange={(date: Date | null) => setEndDate(date)}
+              showTimeSelect
+              dateFormat="MMMM d, yyyy h:mm aa"
+              minDate={new Date()} // Prevent past dates
               className="form-control"
-              value={duration}
-              onChange={(e) => setDuration(Number(e.target.value))}
-              placeholder="Duration in hours"
+              placeholderText="Select end date & time"
               required
             />
           </div>
