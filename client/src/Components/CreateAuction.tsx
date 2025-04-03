@@ -1,24 +1,40 @@
 import React, { useState, FormEvent } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '../modules/CreateAuction.css';
+
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
+
 const CreateAuction: React.FC = () => {
   const [itemName, setItemName] = useState('');
   const [description, setDescription] = useState('');
   const [startPrice, setStartPrice] = useState('');
   const [duration, setDuration] = useState(0); 
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!itemName || !description || !startPrice) {
-      alert('Please fill in all required fields.');
+      setErrorMessage('Please fill in all required fields.');
+      setSuccessMessage(null);
       return;
     }
 
-    // Convert the starting price string to a number.
+    if (isNaN(duration)) {
+      setErrorMessage('Duration must be a number');
+      setSuccessMessage(null);
+      return;
+    } else if (duration <= 0) {
+      setErrorMessage('Duration must be a positive number');
+      setSuccessMessage(null);
+      return;
+    }
+
     const numericPrice = parseFloat(startPrice);
     if (isNaN(numericPrice)) {
-      alert('Starting price must be a valid number.');
+      setErrorMessage('Starting price must be a valid number.');
+      setSuccessMessage(null);
       return;
     }
 
@@ -29,7 +45,6 @@ const CreateAuction: React.FC = () => {
       starting_price: numericPrice,
       duration: duration, 
     };
-
 
     try {
       const res = await fetch(`${backendUrl}/create_auction`, {
@@ -45,13 +60,15 @@ const CreateAuction: React.FC = () => {
         throw new Error(`Error creating auction: ${errorText}`);
       }
 
-      alert('Auction created successfully!');
+      setErrorMessage(null);
+      setSuccessMessage('Auction created successfully!');
       setItemName('');
       setDescription('');
       setStartPrice('');
       setDuration(0); 
     } catch (err: any) {
-      alert(err.message);
+      setErrorMessage(err.message);
+      setSuccessMessage(null);
     }
   };
 
@@ -59,6 +76,19 @@ const CreateAuction: React.FC = () => {
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
       <div className="card p-4 shadow-sm" style={{ maxWidth: '500px', width: '100%' }}>
         <h2 className="text-center mb-4">Create Auction</h2>
+
+        {errorMessage && (
+          <div className="alert alert-danger" role="alert">
+            {errorMessage}
+          </div>
+        )}
+
+        {successMessage && (
+          <div className="success-message">
+            {successMessage}
+        </div>
+        )}
+
         <form onSubmit={handleSubmit}>
           <div className="mb-3">
             <label className="form-label">Item Name</label>

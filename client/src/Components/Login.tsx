@@ -9,6 +9,7 @@ interface LoginProps {
 const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -26,14 +27,15 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
       if (response.ok) {
         localStorage.setItem('user', JSON.stringify({ username }));
         localStorage.setItem('id', data.id); 
+        setErrorMessage(null);
         setIsAuthenticated(true);
         navigate('/');
       } else {
-        alert(data.message || 'Login failed');
+        setErrorMessage(data.message || 'Login failed');
       }
     } catch (error) {
       console.error('Error during login:', error);
-      alert('An error occurred while logging in.');
+      setErrorMessage('An error occurred while logging in.');
     }
   };
 
@@ -41,6 +43,11 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
       <div className="card p-4 shadow-sm" style={{ maxWidth: '400px', width: '100%' }}>
         <h2 className="text-center mb-4">Login</h2>
+        {errorMessage && (
+          <div className="alert alert-danger" role="alert">
+            {errorMessage}
+          </div>
+        )}
         <form onSubmit={handleLogin}>
           <div className="mb-3">
             <label className="form-label">Username</label>

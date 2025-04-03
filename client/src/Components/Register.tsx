@@ -1,11 +1,15 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import '../modules/Register.css';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+
   const navigate = useNavigate();
 
   const handleRegister = async (e: React.FormEvent) => {
@@ -31,14 +35,16 @@ const Register: React.FC = () => {
         }
 
         // If registration is successful, navigate to the login page
-        alert('Registration successful!');
-        navigate('/login');
-      } catch (error) {
+        setErrorMessage(null);
+        setSuccessMessage('Registration successful! Redirecting to login...');
+        setTimeout(() => navigate('/login'), 2000);
+      } catch (error: any) {
         console.error(error);
-        alert('An error occurred during registration. Please try again.');
+        setErrorMessage(error.message);
+        setSuccessMessage(null);
       }
     } else {
-      alert('Please fill in all fields.');
+      setErrorMessage('Please fill in all fields.');
     }
   };
 
@@ -46,6 +52,8 @@ const Register: React.FC = () => {
     <div className="container d-flex justify-content-center align-items-center min-vh-100">
       <div className="card p-4 shadow-sm" style={{ maxWidth: '400px', width: '100%' }}>
         <h2 className="text-center mb-4">Register</h2>
+        {errorMessage && <div className="error-message">{errorMessage}</div>}
+        {successMessage && <div className="success-message">{successMessage}</div>}
         <form onSubmit={handleRegister}>
           <div className="mb-3">
             <label className="form-label">Username</label>
