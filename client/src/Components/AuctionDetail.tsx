@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import '../App.css';
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 interface Auction {
   id: string;
   item: string;
@@ -17,16 +17,30 @@ const AuctionDetail: React.FC = () => {
   const [newBid, setNewBid] = useState<number>(0);
   const [notification, setNotification] = useState<string>('');
 
-  // Simulated API call to fetch auction details
+  // Fetch auction details from the API
   useEffect(() => {
-    const fakeAuction: Auction = {
-      id: id || '1',
-      item: 'Vintage Clock',
-      currentPrice: 50,
-      description: 'A classic vintage clock with intricate details.',
-      endTime: new Date(Date.now() + 3600 * 1000).toISOString() // Auction ends in 1 hour
+    const fetchAuction = async () => {
+      try {
+        const response = await fetch(`${backendUrl}/get_auction_details/${id}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch auction details');
+        }
+        const data = await response.json();
+        // Assuming the response is structured like this:
+        const fetchedAuction: Auction = {
+          id: data.id,
+          item: data.name,
+          currentPrice: data.starting_price,
+          description: data.description,
+          endTime: data.bid_end_time, // Assuming `bid_end_time` is in ISO format
+        };
+        setAuction(fetchedAuction);
+      } catch (error) {
+        console.error('Error fetching auction:', error);
+      }
     };
-    setAuction(fakeAuction);
+
+    fetchAuction();
   }, [id]);
 
   // Countdown timer logic
@@ -45,22 +59,7 @@ const AuctionDetail: React.FC = () => {
     return () => clearInterval(interval);
   }, [auction]);
 
-  // Simulated real-time bid updates (replace with WebSocket in production)
-  useEffect(() => {
-    if (!auction) return;
-    const interval = setInterval(() => {
-      // Randomly simulate an incoming bid
-      const randomIncrease = Math.random() > 0.7 ? Math.floor(Math.random() * 10) + 1 : 0;
-      if (randomIncrease > 0) {
-        setAuction((prev) =>
-          prev ? { ...prev, currentPrice: prev.currentPrice + randomIncrease } : prev
-        );
-        setNotification(`New bid increased by $${randomIncrease}!`);
-      }
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [auction]);
-
+  // Handle the bid submission
   const handleBidSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (auction && newBid > auction.currentPrice) {
@@ -72,6 +71,7 @@ const AuctionDetail: React.FC = () => {
     setNewBid(0);
   };
 
+  // Format the remaining time
   const formatTime = (milliseconds: number) => {
     const totalSeconds = Math.floor(milliseconds / 1000);
     const hours = Math.floor(totalSeconds / 3600);
