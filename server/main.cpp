@@ -1,4 +1,5 @@
 #include "crow.h"
+#include "crow/middlewares/cors.h"
 #include "db_connection.h"
 #include <pqxx/pqxx>
 
@@ -11,9 +12,28 @@ int main() {
         return 1;
     }
 
-    crow::SimpleApp app;
+    // Enable CORS
+    crow::App<crow::CORSHandler> app;
 
-    // Existing route: Register user
+    // Customize CORS
+    auto& cors = app.get_middleware<crow::CORSHandler>();
+
+    // Set up CORS for all routes (you can specify more headers as needed)
+    cors
+      .global()
+        .headers("Content-Type", "Authorization")  // Allowed headers
+        .methods("POST"_method, "GET"_method, "PUT"_method, "DELETE"_method, "OPTIONS"_method)
+        .max_age(5)  // Cache preflight request for 5 seconds
+      .prefix("/register")
+        .origin("*")  // Allow any origin for the /register route
+      .prefix("/login")
+        .origin("*")  // Allow any origin for the /login route
+      .prefix("/edit_user")
+        .origin("*")  // Allow any origin for the /edit_user route
+      .prefix("/create_auction")
+        .origin("*");  // Allow any origin for the /create_auction route
+
+    // Register routes
     CROW_ROUTE(app, "/register").methods("POST"_method)([](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body) {
@@ -36,7 +56,6 @@ int main() {
         }
     });
 
-    // Existing route: Login user
     CROW_ROUTE(app, "/login").methods("POST"_method)([](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body) {
@@ -66,7 +85,6 @@ int main() {
         }
     });
 
-    // Existing route: Edit user
     CROW_ROUTE(app, "/edit_user").methods("PUT"_method)([](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body) {
@@ -90,7 +108,6 @@ int main() {
         }
     });
 
-    // New Route: Create Auction
     CROW_ROUTE(app, "/create_auction").methods("POST"_method)([](const crow::request& req) {
         auto body = crow::json::load(req.body);
         if (!body) {
@@ -121,10 +138,10 @@ int main() {
 
     // Basic test route
     CROW_ROUTE(app, "/")([](){
-        return "Hello, Crow!";
+        return "Check Access-Control-Allow-Methods header";
     });
 
-    // Start the app on port 8080 with multithreading enabled
-    app.port(8080).multithreaded().run();
+    app.port(8080).run();
+
     return 0;
 }
