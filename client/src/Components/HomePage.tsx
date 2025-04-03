@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Homepage = () => {
@@ -9,15 +10,21 @@ const Homepage = () => {
           <p className="lead mb-4">Your premier destination for real-time auctions!</p>
           <div className="row">
             <div className="col-md-4">
-              <h4>Browse Auctions</h4>
+              <h4>
+                <Link to="/auctions" className="text-decoration-none">Browse Auctions</Link>
+              </h4>
               <p>Discover live auctions happening right now and place your bids.</p>
             </div>
             <div className="col-md-4">
-              <h4>Create Auction</h4>
+              <h4>
+                <Link to="/create-auction" className="text-decoration-none">Create Auction</Link>
+              </h4>
               <p>Got something to auction? Start your own auction in minutes.</p>
             </div>
             <div className="col-md-4">
-              <h4>Profile</h4>
+              <h4>
+                <Link to="/profile" className="text-decoration-none">Profile</Link>
+              </h4>
               <p>Manage your profile and track your bids with ease.</p>
             </div>
           </div>
