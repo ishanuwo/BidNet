@@ -123,9 +123,9 @@ int main() {
         std::string name = body["name"].s();
         std::string description = body["description"].s();
         double startingPrice = body["starting_price"].d();
-        int duration = body["duration"].i(); // Duration in hours
+        int duration = body["duration"].i(); // Duration in seconds
         // convert duration in hours to end time
-        std::string bidEndTimeQuery = "NOW() + INTERVAL '" + std::to_string(duration) + " hours'";
+        std::string bidEndTimeQuery = "NOW() + INTERVAL '" + std::to_string(duration) + " seconds'";
 
         try {
             pqxx::work txn(*db.getConnection());
@@ -149,7 +149,7 @@ int main() {
             pqxx::work txn(*db.getConnection());
 
             // Query to get all items, including the 'id' field
-            std::string query = "SELECT id, user_id, name, description, starting_price, bid_end_time FROM items";
+            std::string query = "SELECT id, user_id, name, description, starting_price, bid_end_time, status FROM items";
             pqxx::result res = txn.exec(query);
 
             crow::json::wvalue response_data;
@@ -164,7 +164,7 @@ int main() {
                 item["description"] = row["description"].as<std::string>();
                 item["starting_price"] = row["starting_price"].as<double>();
                 item["bid_end_time"] = row["bid_end_time"].as<std::string>(); // Format as needed
-
+                item["status"] = row["status"].as<std::string>(); // Assuming it's an ISO 8601 string
                 items.push_back(item); // Add the item to the vector
             }
 
@@ -186,7 +186,7 @@ int main() {
             pqxx::work txn(*db.getConnection());
 
             // Query to get all details of an item by 'id'
-            std::string query = "SELECT id, user_id, name, description, starting_price, current_price, bid_end_time FROM items WHERE id = $1";
+            std::string query = "SELECT id, user_id, name, description, starting_price, current_price, bid_end_time, status  FROM items WHERE id = $1";
             pqxx::result res = txn.exec_params(query, id); // Execute the query with the 'id' parameter
 
             // Check if the result is empty (i.e., item not found)
@@ -204,7 +204,7 @@ int main() {
             response_data["starting_price"] = row["starting_price"].as<double>();
             response_data["current_price"] = row["current_price"].as<double>();
             response_data["bid_end_time"] = row["bid_end_time"].as<std::string>(); // Assuming it's an ISO 8601 string
-
+            response_data["status"] = row["status"].as<std::string>(); // Assuming it's an ISO 8601 string
             txn.commit();
 
             // Return the response with the item details
@@ -214,6 +214,32 @@ int main() {
         }
     });
 
+    CROW_ROUTE(app, "/mark_item_sold/<string>") // Define the route with a dynamic 'id' parameter
+    .methods("POST"_method)([](const crow::request& req, const std::string& id) {
+        try {
+            pqxx::work txn(*db.getConnection());
+
+            // Query to check if the item exists
+            std::string query_check = "SELECT id FROM items WHERE id = $1";
+            pqxx::result res_check = txn.exec_params(query_check, id);
+
+            // Check if the item exists
+            if (res_check.empty()) {
+                return crow::response(404, "Item not found");
+            }
+
+            // Query to update the status of the item to 'sold'
+            std::string query_update = "UPDATE items SET status = 'sold' WHERE id = $1";
+            txn.exec_params(query_update, id); // Execute the update query
+
+            txn.commit();
+
+            // Return a success message
+            return crow::response(200, "Item marked as sold");
+        } catch (const std::exception& e) {
+            return crow::response(500, "Error: " + std::string(e.what()));
+        }
+    });
 
 
     CROW_ROUTE(app, "/get_auction_details/<string>") // Define the route with a dynamic 'id' parameter
@@ -222,7 +248,7 @@ int main() {
             pqxx::work txn(*db.getConnection());
 
             // Query to fetch auction details by 'id'
-            std::string query = "SELECT id, user_id, name, description, starting_price, current_price, bid_end_time FROM items WHERE id = $1";
+            std::string query = "SELECT id, user_id, name, description, starting_price, current_price, bid_end_time, status  FROM items WHERE id = $1";
             pqxx::result res = txn.exec_params(query, id); // Execute the query with the id parameter
 
             if (res.empty()) {
@@ -238,7 +264,7 @@ int main() {
             response_data["starting_price"] = row["starting_price"].as<double>();
             response_data["current_price"] = row["current_price"].as<double>();
             response_data["bid_end_time"] = row["bid_end_time"].as<std::string>(); // Assuming it's an ISO 8601 string
-
+            response_data["status"] = row["status"].as<std::string>(); // Assuming it's an ISO 8601 string
             txn.commit();
 
             // Return the auction details as JSON
@@ -260,6 +286,7 @@ int main() {
 
             // Extract the bid data from the request
             int user_id = bid_data["user_id"].i();
+            int seller_id = bid_data["seller_id"].i();
             int item_id = bid_data["item_id"].i();
             double bid_amount = bid_data["bid_amount"].d();
 
@@ -288,8 +315,8 @@ int main() {
             }
 
             // Insert the new bid into the bids table
-            std::string insert_bid_query = "INSERT INTO bids (user_id, item_id, bid_amount) VALUES ($1, $2, $3)";
-            txn.exec_params(insert_bid_query, user_id, item_id, bid_amount);
+            std::string insert_bid_query = "INSERT INTO bids (user_id, item_id, bid_amount, seller_id) VALUES ($1, $2, $3, $4)";
+            txn.exec_params(insert_bid_query, user_id, item_id, bid_amount, seller_id);
 
             // Update the current price of the item to the new bid
             std::string update_price_query = "UPDATE items SET current_price = $1 WHERE id = $2";

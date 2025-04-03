@@ -36,3 +36,4 @@ CREATE TABLE transactions (
     final_price DECIMAL(10,2) NOT NULL,
     transaction_time TIMESTAMP DEFAULT NOW()
 );
+

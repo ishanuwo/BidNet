@@ -13,7 +13,6 @@ const AuctionList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    console.log(import.meta.env);
     // Fetch data from the server
     const fetchAuctions = async () => {
       try {
@@ -23,12 +22,13 @@ const AuctionList: React.FC = () => {
         }
         const data = await response.json();
         // Assuming the response contains an array of auctions
-        const fetchedAuctions = data.items.map((item: any) => ({
+        const fetchedAuctions = data.items.filter((item: any) => item.status === 'active')
+        .map((item: any) => ({
           id: item.id,
           item: item.name, // Change this to match the actual field from your response
           currentPrice: item.starting_price, // Assuming `starting_price` is the current price
         }));
-        
+
         setAuctions(fetchedAuctions);
       } catch (error) {
         console.error('Error fetching auctions:', error);

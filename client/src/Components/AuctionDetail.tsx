@@ -7,6 +7,7 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 interface Auction {
   id: string;
   item: string;
+  user_id: number;
   startingPrice: number;
   currentPrice: number;
   description: string;
@@ -33,6 +34,7 @@ const AuctionDetail: React.FC = () => {
         // Assuming the response is structured like this:
         const fetchedAuction: Auction = {
           id: data.id,
+          user_id: data.user_id,
           item: data.name,
           startingPrice: data.starting_price,
           currentPrice: data.current_price,
@@ -80,6 +82,7 @@ const AuctionDetail: React.FC = () => {
         user_id: userId,
         item_id: id,
         bid_amount: newBid,
+        seller_id: auction.user_id,
       };
       
       // Send the bid data to your server (You can implement this logic in the backend)
