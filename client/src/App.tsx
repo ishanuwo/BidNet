@@ -25,45 +25,62 @@ const App: React.FC = () => {
 
   return (
     <Router>
-      <header className="main-header">
-        <div className="header-container">
-          <div className="logo">
-            <Link to="/">BidNet</Link>
-          </div>
-          <nav className="main-nav">
-            <ul>
-              <li><Link to="/" className="nav-link">Home</Link></li>
-              <li><Link to="/auctions" className="nav-link">Auctions</Link></li>
-              <li><Link to="/create-auction" className="nav-link">Create Auction</Link></li>
-
-              {isAuthenticated ? (
-                <li>
-                  <button onClick={handleLogout} className="nav-link logout-btn">Logout</button>
+      <div>
+        {/* Navbar */}
+        <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+          <div className="container-fluid">
+            <Link className="navbar-brand fs-3" to="/home">BidNet</Link>
+            <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+              <span className="navbar-toggler-icon"></span>
+            </button>
+            <div className="collapse navbar-collapse" id="navbarNav">
+              <ul className="navbar-nav ms-auto">
+                <li className="nav-item">
+                  <Link className="nav-link fs-5" to="/home">Home</Link>
                 </li>
-              ) : (
-                <>
-                  <li><Link to="/login" className="nav-link">Login</Link></li>
-                  <li><Link to="/register" className="nav-link">Register</Link></li>
-                </>
-              )}
-            </ul>
-          </nav>
+                <li className="nav-item">
+                  <Link className="nav-link fs-5" to="/auctions">Auctions</Link>
+                </li>
+                <li className="nav-item">
+                  <Link className="nav-link fs-5" to="/create-auction">Create Auction</Link>
+                </li>
+                {!isAuthenticated ? (
+                  <>
+                    <li className="nav-item">
+                      <Link className="nav-link fs-5" to="/login">Login</Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link className="nav-link fs-5" to="/register">Register</Link>
+                    </li>
+                  </>
+                ) : (
+                  <li className="nav-item">
+                    <button className="btn btn-link nav-link fs-5" onClick={handleLogout}>Logout</button>
+                  </li>
+                )}
+              </ul>
+            </div>
+          </div>
+        </nav>
+
+        {/* Routes */}
+        <div className="container mt-5">
+          <Routes>
+            <Route path="/home" element={<HomePage />} />
+            <Route path="/auctions" element={<AuctionList />} />
+            <Route path="/auctions/:id" element={<AuctionDetail />} />
+            <Route path="/create-auction" element={<CreateAuction />} />
+            <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated}/>} />
+            <Route path="/register" element={<Register />} />
+            <Route path="*" element={<NotFound />} />
+          </Routes>
         </div>
-      </header>
-      <main id="root">
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/auctions" element={<AuctionList />} />
-          <Route path="/auction/:id" element={<AuctionDetail />} />
-          <Route path="/create-auction" element={<CreateAuction />} />
-          <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated} />} />
-          <Route path="/register" element={<Register />} />
-          <Route path="*" element={<NotFound />} />
-        </Routes>
-      </main>
-      <footer className="main-footer">
-        <p>&copy; {new Date().getFullYear()} BidNet. All rights reserved.</p>
-      </footer>
+
+        {/* Footer */}
+        <footer className="bg-light text-center py-3 mt-5 shadow-sm">
+          <p className="mb-0">© 2025 BidNet. All rights reserved.</p>
+        </footer>
+      </div>
     </Router>
   );
 };
