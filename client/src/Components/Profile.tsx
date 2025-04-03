@@ -31,18 +31,9 @@ const Profile: React.FC = () => {
 
   // Check if a user is logged in by looking for "user" in localStorage.
   // If found, try to parse it (assuming it's stored as JSON) to extract the user id.
-  const storedUser = localStorage.getItem('user');
+  const storedUser = localStorage.getItem('id');
   if (!storedUser) {
     return <Navigate to="/login" replace />;
-  }
-  
-  let userId: number;
-  try {
-    const parsedUser = JSON.parse(storedUser);
-    userId = parsedUser.id;
-  } catch (error) {
-    // If parsing fails, assume storedUser is the id string.
-    userId = parseInt(storedUser);
   }
 
   useEffect(() => {
@@ -61,7 +52,7 @@ const Profile: React.FC = () => {
       const data = await res.json();
       // Filter to current user's active items.
       const userItems = data.items.filter(
-        (item: Item) => item.user_id === userId && item.status === 'active'
+        (item: Item) => item.user_id === Number(storedUser) && item.status === 'active'
       );
       // For each item, fetch additional details (current_price).
       const enrichedItems = await Promise.all(
@@ -82,7 +73,7 @@ const Profile: React.FC = () => {
 
   const fetchSoldTransactions = async () => {
     try {
-      const res = await fetch(`${backendUrl}/get_transactions_for_seller/${userId}`);
+      const res = await fetch(`${backendUrl}/get_transactions_for_seller/${Number(storedUser)}`);
       if (!res.ok) {
         console.log('No sold transactions or server error');
         return;
@@ -96,7 +87,7 @@ const Profile: React.FC = () => {
 
   const fetchBoughtTransactions = async () => {
     try {
-      const res = await fetch(`${backendUrl}/get_transactions_for_buyer/${userId}`);
+      const res = await fetch(`${backendUrl}/get_transactions_for_buyer/${Number(storedUser)}`);
       if (!res.ok) {
         console.log('No bought transactions or server error');
         return;
