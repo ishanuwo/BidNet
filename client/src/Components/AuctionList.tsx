@@ -13,12 +13,27 @@ const AuctionList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    // Simulated API call to fetch auctions
-    setAuctions([
-      { id: 1, item: 'Vintage Clock', currentPrice: 50 },
-      { id: 2, item: 'Antique Vase', currentPrice: 120 },
-      { id: 3, item: 'Rare Painting', currentPrice: 300 },
-    ]);
+    // Fetch data from the server
+    const fetchAuctions = async () => {
+      try {
+        const response = await fetch('http://localhost:8080/get_all_items');
+        if (!response.ok) {
+          throw new Error('Failed to fetch auctions');
+        }
+        const data = await response.json();
+        // Assuming the response contains an array of auctions
+        const fetchedAuctions = data.items.map((item: any) => ({
+          id: item.id,
+          item: item.name, // Change this to match the actual field from your response
+          currentPrice: item.starting_price, // Assuming `starting_price` is the current price
+        }));
+        setAuctions(fetchedAuctions);
+      } catch (error) {
+        console.error('Error fetching auctions:', error);
+      }
+    };
+
+    fetchAuctions();
   }, []);
 
   const filteredAuctions = auctions.filter(auction =>
