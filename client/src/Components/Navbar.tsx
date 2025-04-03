@@ -16,12 +16,15 @@ const Navbar: React.FC<{ isAuthenticated: boolean; handleLogout: () => void }> =
             <li className="nav-item">
               <Link className="nav-link fs-5" to="/">Home</Link>
             </li>
+            {isAuthenticated && (<>
             <li className="nav-item">
               <Link className="nav-link fs-5" to="/auctions">Auctions</Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link fs-5" to="/create-auction">Create Auction</Link>
             </li>
+            </>
+            )}
             {!isAuthenticated ? (
               <>
                 <li className="nav-item">

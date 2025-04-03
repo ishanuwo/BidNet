@@ -28,6 +28,7 @@ const AuctionList: React.FC = () => {
           item: item.name, // Change this to match the actual field from your response
           currentPrice: item.starting_price, // Assuming `starting_price` is the current price
         }));
+        
         setAuctions(fetchedAuctions);
       } catch (error) {
         console.error('Error fetching auctions:', error);
