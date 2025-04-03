@@ -24,7 +24,7 @@ const Login: React.FC<LoginProps> = ({ setIsAuthenticated }) => {
 
       if (response.ok) {
         localStorage.setItem('user', JSON.stringify({ username }));
-        localStorage.setItem('id', JSON.stringify({ id: data.id }));
+        localStorage.setItem('id', data.id); 
         setIsAuthenticated(true);
         navigate('/');
       } else {

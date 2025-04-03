@@ -23,12 +23,12 @@ const CreateAuction: React.FC = () => {
     }
 
     const data = {
+      user_id: localStorage.getItem('id'),
       name: itemName,
       description,
       starting_price: numericPrice
     };
 
-    console.log('Submitting data:', data);
 
     try {
       const res = await fetch('http://localhost:8080/create_auction', {

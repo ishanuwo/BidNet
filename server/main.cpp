@@ -124,6 +124,8 @@ int main() {
         }
 
         // Extract auction data from JSON
+        int userId = body["user_id"].i(); 
+        // std::cout << "User ID: " << userId << std::endl; // Debugging line
         std::string name = body["name"].s();
         std::string description = body["description"].s();
         double startingPrice = body["starting_price"].d();
@@ -131,9 +133,9 @@ int main() {
         try {
             pqxx::work txn(*db.getConnection());
             std::string query =
-                "INSERT INTO items (user_id, name, description, starting_price, bid_end_time) "
-                "VALUES (1, " + txn.quote(name) + ", " + txn.quote(description) + ", " +
-                txn.quote(startingPrice) + ", NOW() + INTERVAL '7 days')";
+            "INSERT INTO items (user_id, name, description, starting_price, bid_end_time) "
+            "VALUES (" + txn.quote(userId) + ", " + txn.quote(name) + ", " + txn.quote(description) + ", " +
+            txn.quote(startingPrice) + ", NOW() + INTERVAL '7 days')";
             txn.exec(query);
             txn.commit();
 
