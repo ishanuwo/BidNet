@@ -4,17 +4,8 @@ import '../App.css';
 const CreateAuction: React.FC = () => {
   const [itemName, setItemName] = useState('');
   const [description, setDescription] = useState('');
-  const [startPrice, setStartPrice] = useState<number | string>('');
-  const [image, setImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string>('');
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.files && e.target.files.length > 0) {
-      const file = e.target.files[0];
-      setImage(file);
-      setPreview(URL.createObjectURL(file));
-    }
-  };
+  // Store the starting price as a string from the input field.
+  const [startPrice, setStartPrice] = useState('');
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -24,19 +15,28 @@ const CreateAuction: React.FC = () => {
       return;
     }
 
-    // For now, just send text data as JSON. (We'll skip the image.)
+    // Convert the starting price string to a number.
+    const numericPrice = parseFloat(startPrice);
+    if (isNaN(numericPrice)) {
+      alert('Starting price must be a valid number.');
+      return;
+    }
+
     const data = {
       name: itemName,
       description,
-      startPrice
-      // If you want to handle images, you can do multi-part form data or a second endpoint.
+      starting_price: numericPrice
     };
 
+    console.log('Submitting data:', data);
+
     try {
-      const res = await fetch('http://localhost:4000/api/auction/create', {
+      const res = await fetch('http://localhost:8080/create_auction', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
       });
 
       if (!res.ok) {
@@ -48,8 +48,6 @@ const CreateAuction: React.FC = () => {
       setItemName('');
       setDescription('');
       setStartPrice('');
-      setImage(null);
-      setPreview('');
     } catch (err: any) {
       alert(err.message);
     }
@@ -93,8 +91,6 @@ const CreateAuction: React.FC = () => {
           />
         </label>
         <br />
-
-        
 
         <button type="submit" className="button">
           Create Auction
