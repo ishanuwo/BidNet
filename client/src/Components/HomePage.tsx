@@ -4,7 +4,7 @@ import '../App.css';
 
 const HomePage: React.FC = () => (
   <div className="home-page">
-    <header className="card">
+    <header className="card-child">
       <h1>Welcome to BidNet</h1>
       <p>Your premier destination for real-time auctions!</p>
       <nav>
@@ -14,15 +14,15 @@ const HomePage: React.FC = () => (
       </nav>
     </header>
     <section>
-      <div className="card">
+      <div className="card-child">
         <h3>Real-Time Bidding</h3>
         <p>Experience auctions like never before with instant bid updates.</p>
       </div>
-      <div className="card">
+      <div className="card-child">
         <h3>Secure Transactions</h3>
         <p>Every bid and transaction is processed securely with ACID compliance.</p>
       </div>
-      <div className="card">
+      <div className="card-child">
         <h3>User-Friendly Interface</h3>
         <p>Our intuitive design makes bidding fun and easy.</p>
       </div>
