@@ -123,13 +123,16 @@ int main() {
         std::string name = body["name"].s();
         std::string description = body["description"].s();
         double startingPrice = body["starting_price"].d();
+        int duration = body["duration"].i(); // Duration in hours
+        // convert duration in hours to end time
+        std::string bidEndTimeQuery = "NOW() + INTERVAL '" + std::to_string(duration) + " hours'";
 
         try {
             pqxx::work txn(*db.getConnection());
             std::string query =
             "INSERT INTO items (user_id, name, description, starting_price, bid_end_time) "
             "VALUES (" + txn.quote(userId) + ", " + txn.quote(name) + ", " + txn.quote(description) + ", " +
-            txn.quote(startingPrice) + ", NOW() + INTERVAL '7 days')";
+            txn.quote(startingPrice) + ", " + bidEndTimeQuery + ");";
             txn.exec(query);
             txn.commit();
 

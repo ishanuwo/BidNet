@@ -49,7 +49,9 @@ const AuctionDetail: React.FC = () => {
     const interval = setInterval(() => {
       const now = new Date();
       const end = new Date(auction.endTime);
-      const diff = Math.max(end.getTime() - now.getTime(), 0);
+      const adjustedEndTime = new Date(end.getTime() - 4 * 60 * 60 * 1000);
+      const diff = Math.max(adjustedEndTime.getTime() - now.getTime(), 0);
+      
       setTimeRemaining(diff);
       if (diff === 0) {
         clearInterval(interval);

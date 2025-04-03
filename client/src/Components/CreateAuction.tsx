@@ -4,8 +4,8 @@ const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const CreateAuction: React.FC = () => {
   const [itemName, setItemName] = useState('');
   const [description, setDescription] = useState('');
-  // Store the starting price as a string from the input field.
   const [startPrice, setStartPrice] = useState('');
+  const [duration, setDuration] = useState(0); 
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -26,7 +26,8 @@ const CreateAuction: React.FC = () => {
       user_id: localStorage.getItem('id'),
       name: itemName,
       description,
-      starting_price: numericPrice
+      starting_price: numericPrice,
+      duration: duration, 
     };
 
 
@@ -48,6 +49,7 @@ const CreateAuction: React.FC = () => {
       setItemName('');
       setDescription('');
       setStartPrice('');
+      setDuration(0); 
     } catch (err: any) {
       alert(err.message);
     }
@@ -84,6 +86,17 @@ const CreateAuction: React.FC = () => {
               className="form-control"
               value={startPrice}
               onChange={(e) => setStartPrice(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Add Duration</label>
+            <input
+              type="number"
+              className="form-control"
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
+              placeholder="Duration in hours"
               required
             />
           </div>
