@@ -94,22 +94,7 @@ const CreateAuction: React.FC = () => {
         </label>
         <br />
 
-        <label>
-          Upload Image (optional):
-          <input
-            type="file"
-            accept="image/*"
-            onChange={handleImageChange}
-            className="search-input"
-          />
-        </label>
-
-        {preview && (
-          <div className="image-preview">
-            <img src={preview} alt="Preview" />
-          </div>
-        )}
-        <br />
+        
 
         <button type="submit" className="button">
           Create Auction
