@@ -7,14 +7,14 @@ const Navbar: React.FC<{ isAuthenticated: boolean; handleLogout: () => void }> =
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
       <div className="container-fluid">
-        <Link className="navbar-brand fs-3" to="/home">BidNet</Link>
+        <Link className="navbar-brand fs-3" to="/">BidNet</Link>
         <button className="navbar-toggler" type="button" onClick={() => setIsOpen(!isOpen)}>
           <span className="navbar-toggler-icon"></span>
         </button>
         <div className={`collapse navbar-collapse ${isOpen ? 'show' : ''}`} id="navbarNav">
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
-              <Link className="nav-link fs-5" to="/home">Home</Link>
+              <Link className="nav-link fs-5" to="/">Home</Link>
             </li>
             <li className="nav-item">
               <Link className="nav-link fs-5" to="/auctions">Auctions</Link>
