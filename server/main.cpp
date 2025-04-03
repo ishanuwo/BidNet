@@ -123,7 +123,6 @@ int main() {
         std::string name = body["name"].s();
         std::string description = body["description"].s();
         double startingPrice = body["starting_price"].d();
-        double current_price = body["starting_price"].d();
         int duration = body["duration"].i(); // Duration in hours
         // convert duration in hours to end time
         std::string bidEndTimeQuery = "NOW() + INTERVAL '" + std::to_string(duration) + " hours'";
@@ -133,8 +132,8 @@ int main() {
             std::string query =
             "INSERT INTO items (user_id, name, description, starting_price, current_price, bid_end_time) "
             "VALUES (" + txn.quote(userId) + ", " + txn.quote(name) + ", " + txn.quote(description) + ", " +
-            txn.quote(startingPrice)", " +
-            txn.quote(current_price) + ", " + bidEndTimeQuery + ");";
+            txn.quote(startingPrice) + ", " + txn.quote(startingPrice) + ", " + bidEndTimeQuery + ");";
+        
             txn.exec(query);
             txn.commit();
 
