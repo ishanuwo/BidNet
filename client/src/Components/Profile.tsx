@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './Profile.css';
+import '../modules/Profile.css';
 
 interface Item {
   id: number;
