@@ -28,3 +28,7 @@ server
 
 #Builds
 build
+
+CMakeLists.txt
+
+build.sh
