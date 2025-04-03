@@ -1,11 +1,10 @@
-import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 const Homepage = () => {
   return (
     <div className="container-fluid">
-      <main className="text-center py-5">
-        <div className="container">
+      <main className="text-center">
+        <div>
           <h1 className="display-4 mb-4">Welcome to BidNet</h1>
           <p className="lead mb-4">Your premier destination for real-time auctions!</p>
           <div className="row">
@@ -24,8 +23,8 @@ const Homepage = () => {
           </div>
         </div>
 
-        <section className="py-5 bg-dark text-white">
-          <div className="container">
+        <section className="py-3 bg-dark text-white">
+          <div>
             <h2 className="display-5 text-center mb-4">Real-Time Bidding</h2>
             <p className="lead text-center mb-4">Experience auctions like never before with instant bid updates.</p>
             <h2 className="display-5 text-center mb-4">Secure Transactions</h2>

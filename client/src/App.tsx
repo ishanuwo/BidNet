@@ -27,7 +27,7 @@ const App: React.FC = () => {
     <Router>
       <div>
         <Navbar isAuthenticated={isAuthenticated} handleLogout={handleLogout} />
-        <div className="container mt-5">
+        <div className="container mt-1">
           <Routes>
             <Route path="/home" element={<HomePage />} />
             <Route path="/auctions" element={<AuctionList />} />
