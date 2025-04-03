@@ -123,6 +123,7 @@ int main() {
         std::string name = body["name"].s();
         std::string description = body["description"].s();
         double startingPrice = body["starting_price"].d();
+        double current_price = body["starting_price"].d();
         int duration = body["duration"].i(); // Duration in hours
         // convert duration in hours to end time
         std::string bidEndTimeQuery = "NOW() + INTERVAL '" + std::to_string(duration) + " hours'";
@@ -130,9 +131,10 @@ int main() {
         try {
             pqxx::work txn(*db.getConnection());
             std::string query =
-            "INSERT INTO items (user_id, name, description, starting_price, bid_end_time) "
+            "INSERT INTO items (user_id, name, description, starting_price, current_price, bid_end_time) "
             "VALUES (" + txn.quote(userId) + ", " + txn.quote(name) + ", " + txn.quote(description) + ", " +
-            txn.quote(startingPrice) + ", " + bidEndTimeQuery + ");";
+            txn.quote(startingPrice)", " +
+            txn.quote(current_price) + ", " + bidEndTimeQuery + ");";
             txn.exec(query);
             txn.commit();
 
@@ -185,7 +187,7 @@ int main() {
             pqxx::work txn(*db.getConnection());
 
             // Query to fetch auction details by 'id'
-            std::string query = "SELECT id, user_id, name, description, starting_price, bid_end_time FROM items WHERE id = $1";
+            std::string query = "SELECT id, user_id, name, description, starting_price, current_price, bid_end_time FROM items WHERE id = $1";
             pqxx::result res = txn.exec_params(query, id); // Execute the query with the id parameter
 
             if (res.empty()) {
@@ -199,6 +201,7 @@ int main() {
             response_data["name"] = row["name"].as<std::string>();
             response_data["description"] = row["description"].as<std::string>();
             response_data["starting_price"] = row["starting_price"].as<double>();
+            response_data["current_price"] = row["current_price"].as<double>();
             response_data["bid_end_time"] = row["bid_end_time"].as<std::string>(); // Assuming it's an ISO 8601 string
 
             txn.commit();
@@ -211,6 +214,70 @@ int main() {
             return crow::response(500, "Error: " + std::string(e.what()));
         }
     });
+    CROW_ROUTE(app, "/place_bid")
+    .methods("POST"_method)([](const crow::request& req) {
+        try {
+            // Parse the JSON body
+            auto bid_data = crow::json::load(req.body);
+            if (!bid_data) {
+                return crow::response(400, "Invalid JSON");
+            }
+
+            // Extract the bid data from the request
+            int user_id = bid_data["user_id"].i();
+            int item_id = bid_data["item_id"].i();
+            double bid_amount = bid_data["bid_amount"].d();
+
+            // Check if the user_id, item_id, and bid_amount are valid
+            if (user_id <= 0 || item_id <= 0 || bid_amount <= 0) {
+                return crow::response(400, "Invalid bid data");
+            }
+
+            pqxx::work txn(*db.getConnection());
+
+            // Get the current price of the item
+            std::string query = "SELECT current_price FROM items WHERE id = $1";
+            pqxx::result res = txn.exec_params(query, item_id);
+
+            if (res.empty()) {
+                return crow::response(404, "Item not found");
+            }
+
+            double current_price = res[0]["current_price"].as<double>();
+
+            // Check if the bid is higher than the current price
+            if (bid_amount <= current_price) {
+                crow::json::wvalue response_data;
+                response_data["message"] = "Bid must be higher than the current price";
+                return crow::response(400,  response_data);
+            }
+
+            // Insert the new bid into the bids table
+            std::string insert_bid_query = "INSERT INTO bids (user_id, item_id, bid_amount) VALUES ($1, $2, $3)";
+            txn.exec_params(insert_bid_query, user_id, item_id, bid_amount);
+
+            // Update the current price of the item to the new bid
+            std::string update_price_query = "UPDATE items SET current_price = $1 WHERE id = $2";
+            txn.exec_params(update_price_query, bid_amount, item_id);
+
+            txn.commit();
+
+            // Return a success response
+            crow::json::wvalue response_data;
+            response_data["message"] = "Bid placed successfully";
+            response_data["new_bid_amount"] = bid_amount;
+
+            return crow::response(200, response_data);
+
+        } catch (const std::exception& e) {
+            crow::json::wvalue response_data;
+            response_data["message"] = "Error: " + std::string(e.what());
+            return crow::response(400,  response_data);
+            return crow::response(500, response_data);
+        }
+    });
+
+
 
     // Basic test route
     CROW_ROUTE(app, "/")([](){
