@@ -7,6 +7,7 @@ import CreateAuction from './Components/CreateAuction';
 import Profile from './Components/Profile';
 import Login from './Components/Login';
 import NotFound from './Components/NotFound';
+import Register from './Components/Register';
 import './App.css';
 
 const App: React.FC = () => {
@@ -24,6 +25,7 @@ const App: React.FC = () => {
               <li><Link to="/create-auction" className="nav-link">Create Auction</Link></li>
               <li><Link to="/profile" className="nav-link">Profile</Link></li>
               <li><Link to="/login" className="nav-link">Login</Link></li>
+              <li><Link to="/register" className="nav-link">Register</Link></li>
             </ul>
           </nav>
         </div>
@@ -36,6 +38,7 @@ const App: React.FC = () => {
           <Route path="/create-auction" element={<CreateAuction />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
