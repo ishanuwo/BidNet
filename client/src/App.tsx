@@ -8,6 +8,7 @@ import Login from './Components/Login';
 import NotFound from './Components/NotFound';
 import Register from './Components/Register';
 import Navbar from './Components/Navbar';
+import Profile from './Components/Profile';
 import './App.css';
 
 const App: React.FC = () => {
@@ -32,6 +33,7 @@ const App: React.FC = () => {
           <Routes>
             <Route path="/" element={<HomePage />} />
             <Route path="/auctions" element={<AuctionList />} />
+            <Route path="/profile" element={<Profile />} />
             <Route path="/auction/:id" element={<AuctionDetail />} />
             <Route path="/create-auction" element={<CreateAuction />} />
             <Route path="/login" element={<Login setIsAuthenticated={setIsAuthenticated}/>} />

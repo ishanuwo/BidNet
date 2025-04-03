@@ -18,6 +18,9 @@ const Navbar: React.FC<{ isAuthenticated: boolean; handleLogout: () => void }> =
             </li>
             {isAuthenticated && (<>
             <li className="nav-item">
+              <Link className="nav-link fs-5" to="/profile">Profile</Link>
+            </li>
+            <li className="nav-item">
               <Link className="nav-link fs-5" to="/auctions">Auctions</Link>
             </li>
             <li className="nav-item">
@@ -33,6 +36,7 @@ const Navbar: React.FC<{ isAuthenticated: boolean; handleLogout: () => void }> =
                 <li className="nav-item">
                   <Link className="nav-link fs-5" to="/register">Register</Link>
                 </li>
+                
               </>
             ) : (
               <li className="nav-item">
