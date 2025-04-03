@@ -28,6 +28,8 @@ const Profile: React.FC = () => {
   const [itemsListed, setItemsListed] = useState<Item[]>([]);
   const [itemsSold, setItemsSold] = useState<Transaction[]>([]);
   const [itemsBought, setItemsBought] = useState<Transaction[]>([]);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
   // Check if a user is logged in by looking for "user" in localStorage.
   // If found, try to parse it (assuming it's stored as JSON) to extract the user id.
@@ -47,6 +49,8 @@ const Profile: React.FC = () => {
     try {
       const res = await fetch(`${backendUrl}/get_all_items`);
       if (!res.ok) {
+        setErrorMessage('Failed to fetch items');
+        setSuccessMessage(null);
         throw new Error('Failed to fetch items');
       }
       const data = await res.json();
@@ -59,6 +63,8 @@ const Profile: React.FC = () => {
         userItems.map(async (item: Item) => {
           const detailRes = await fetch(`${backendUrl}/get_item_details/${item.id}`);
           if (!detailRes.ok) {
+            setErrorMessage('Failed to fetch item details');
+            setSuccessMessage(null);
             throw new Error('Failed to fetch item details');
           }
           const detailData = await detailRes.json();
@@ -75,6 +81,8 @@ const Profile: React.FC = () => {
     try {
       const res = await fetch(`${backendUrl}/get_transactions_for_seller/${Number(storedUser)}`);
       if (!res.ok) {
+        // setErrorMessage('No sold transactions or server error');
+        setSuccessMessage(null);
         console.log('No sold transactions or server error');
         return;
       }
@@ -89,6 +97,8 @@ const Profile: React.FC = () => {
     try {
       const res = await fetch(`${backendUrl}/get_transactions_for_buyer/${Number(storedUser)}`);
       if (!res.ok) {
+        // setErrorMessage('No bought transactions or server error');
+        setSuccessMessage(null);
         console.log('No bought transactions or server error');
         return;
       }
@@ -106,12 +116,16 @@ const Profile: React.FC = () => {
         method: 'POST',
       });
       if (!res.ok) {
+        setErrorMessage('Failed to complete transaction');
+        setSuccessMessage(null);
         throw new Error('Failed to complete transaction');
       }
       // Remove sold item from listed items.
       setItemsListed((prev) => prev.filter((item) => item.id !== itemId));
       // Refresh sold transactions to reflect the new sale.
       fetchSoldTransactions();
+      setErrorMessage(null);
+      setSuccessMessage('Sold Successfully!');
     } catch (error) {
       console.error(error);
     }
@@ -120,6 +134,8 @@ const Profile: React.FC = () => {
   return (
     <div className="profile-container d-flex flex-column align-items-center">
       <h1 className="profile-header">Profile Page</h1>
+      {errorMessage && <div className="error-message">{errorMessage}</div>}
+      {successMessage && <div className="success-message">{successMessage}</div>}
       <div className="content-container">
         <div className="row">
           {/* Items Listed */}
