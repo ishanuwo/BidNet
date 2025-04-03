@@ -24,14 +24,8 @@ int main() {
         .headers("Content-Type", "Authorization")  // Allowed headers
         .methods("POST"_method, "GET"_method, "PUT"_method, "DELETE"_method, "OPTIONS"_method)
         .max_age(5)  // Cache preflight request for 5 seconds
-      .prefix("/register")
-        .origin("*")  // Allow any origin for the /register route
-      .prefix("/login")
-        .origin("*")  // Allow any origin for the /login route
-      .prefix("/edit_user")
-        .origin("*")  // Allow any origin for the /edit_user route
-      .prefix("/create_auction")
-        .origin("*");  // Allow any origin for the /create_auction route
+      .prefix("/")
+        .origin("*");
 
     // Register routes
     CROW_ROUTE(app, "/register").methods("POST"_method)([](const crow::request& req) {
@@ -149,7 +143,7 @@ int main() {
 
     // Basic test route
     CROW_ROUTE(app, "/")([](){
-        return "Check Access-Control-Allow-Methods header";
+        return "Hit from Crow!";
     });
 
     app.port(8080).run();

@@ -29,7 +29,7 @@ Database::Database() {
 
 Database::~Database() {
     if (conn && conn->is_open()) {
-        conn->disconnect();
+        conn->close();
         std::cout << "Database connection closed" << std::endl;
     }
 }
