@@ -32,6 +32,7 @@ CREATE TABLE transactions (
     id SERIAL PRIMARY KEY,
     item_id INT REFERENCES items(id) ON DELETE CASCADE,
     buyer_id INT REFERENCES users(id) ON DELETE SET NULL,
+    seller_id INT REFERENCES users(id) ON DELETE SET NULL,  -- New seller_id column
     final_price DECIMAL(10,2) NOT NULL,
     transaction_time TIMESTAMP DEFAULT NOW()
 );

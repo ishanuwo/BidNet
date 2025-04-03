@@ -180,6 +180,42 @@ int main() {
         }
     });
 
+    CROW_ROUTE(app, "/get_item_details/<string>") // Define the route with a dynamic 'id' parameter
+    .methods("GET"_method)([](const crow::request& req, const std::string& id) {
+        try {
+            pqxx::work txn(*db.getConnection());
+
+            // Query to get all details of an item by 'id'
+            std::string query = "SELECT id, user_id, name, description, starting_price, current_price, bid_end_time FROM items WHERE id = $1";
+            pqxx::result res = txn.exec_params(query, id); // Execute the query with the 'id' parameter
+
+            // Check if the result is empty (i.e., item not found)
+            if (res.empty()) {
+                return crow::response(404, "Item not found");
+            }
+
+            // Prepare the response with all item details
+            crow::json::wvalue response_data;
+            const auto& row = res[0]; // We expect only one row since id is unique
+            response_data["id"] = row["id"].as<int>();
+            response_data["user_id"] = row["user_id"].as<int>();
+            response_data["name"] = row["name"].as<std::string>();
+            response_data["description"] = row["description"].as<std::string>();
+            response_data["starting_price"] = row["starting_price"].as<double>();
+            response_data["current_price"] = row["current_price"].as<double>();
+            response_data["bid_end_time"] = row["bid_end_time"].as<std::string>(); // Assuming it's an ISO 8601 string
+
+            txn.commit();
+
+            // Return the response with the item details
+            return crow::response(200, response_data);
+        } catch (const std::exception& e) {
+            return crow::response(500, "Error: " + std::string(e.what()));
+        }
+    });
+
+
+
     CROW_ROUTE(app, "/get_auction_details/<string>") // Define the route with a dynamic 'id' parameter
     .methods("GET"_method)([](const crow::request& req, const std::string& id) {
         try {
@@ -276,7 +312,83 @@ int main() {
         }
     });
 
+    CROW_ROUTE(app, "/get_transactions_for_buyer/<int>") // Define the route with a dynamic 'buyer_id' parameter
+    .methods("GET"_method)([](const crow::request& req, const int buyer_id) {
+        try {
+            pqxx::work txn(*db.getConnection());
+    
+            // Query to fetch transactions where the buyer_id matches the parameter
+            std::string query = "SELECT id, item_id, buyer_id, seller_id, final_price, transaction_time FROM transactions WHERE buyer_id = $1";
+            pqxx::result res = txn.exec_params(query, buyer_id); // Execute the query with the buyer_id parameter
+    
+            if (res.empty()) {
+                return crow::response(404, "No transactions found for the buyer");
+            }
+    
+            crow::json::wvalue response_data;
+            std::vector<crow::json::wvalue> items;
+            for (const auto& row : res) {
+                crow::json::wvalue transaction;
+                transaction["id"] = row["id"].as<int>();
+                transaction["item_id"] = row["item_id"].as<int>();
+                transaction["buyer_id"] = row["buyer_id"].as<int>();
+                transaction["seller_id"] = row["seller_id"].as<int>();
+                transaction["final_price"] = row["final_price"].as<double>();
+                transaction["transaction_time"] = row["transaction_time"].as<std::string>();
+    
+                items.push_back(transaction); // Add the transaction to the response array
+            }
+            response_data["items"] = std::move(items);
+            txn.commit();
+    
+            // Return the list of transactions for the buyer
+            return crow::response(200, response_data);
+    
+        } catch (const std::exception& e) {
+            // Handle any errors that occur
+            return crow::response(500, "Error: " + std::string(e.what()));
+        }
+    });
 
+    CROW_ROUTE(app, "/get_transactions_for_seller/<int>") // Define the route with a dynamic 'seller_id' parameter
+        .methods("GET"_method)([](const crow::request& req, const int seller_id) {
+            try {
+                pqxx::work txn(*db.getConnection());
+
+                // Query to fetch transactions where the seller_id matches the parameter
+                std::string query = "SELECT id, item_id, buyer_id, seller_id, final_price, transaction_time FROM transactions WHERE seller_id = $1";
+                pqxx::result res = txn.exec_params(query, seller_id); // Execute the query with the seller_id parameter
+
+                if (res.empty()) {
+                    return crow::response(404, "No transactions found for the seller");
+                }
+
+                crow::json::wvalue response_data;
+                std::vector<crow::json::wvalue> items;
+                for (const auto& row : res) {
+                    crow::json::wvalue transaction;
+                    transaction["id"] = row["id"].as<int>();
+                    transaction["item_id"] = row["item_id"].as<int>();
+                    transaction["buyer_id"] = row["buyer_id"].as<int>();
+                    transaction["seller_id"] = row["seller_id"].as<int>();
+                    transaction["final_price"] = row["final_price"].as<double>();
+                    transaction["transaction_time"] = row["transaction_time"].as<std::string>();
+
+                    items.push_back(transaction); // Add the transaction to the response array
+                }
+                response_data["items"] = std::move(items);
+                txn.commit();
+
+                // Return the list of transactions for the seller
+                return crow::response(200, response_data);
+
+            } catch (const std::exception& e) {
+                // Handle any errors that occur
+                return crow::response(500, "Error: " + std::string(e.what()));
+            }
+        });
+
+    
 
     // Basic test route
     CROW_ROUTE(app, "/")([](){
