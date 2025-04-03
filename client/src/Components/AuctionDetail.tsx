@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import '../App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 interface Auction {
   id: string;
@@ -83,24 +83,29 @@ const AuctionDetail: React.FC = () => {
   if (!auction) return <div>Loading auction details...</div>;
 
   return (
-    <div className="auction-detail card">
-      <h2>{auction.item}</h2>
-      <p>{auction.description}</p>
-      <p className="price">Current Price: ${auction.currentPrice}</p>
-      <p className="countdown">Time Remaining: {formatTime(timeRemaining)}</p>
-      {notification && <div className="notification">{notification}</div>}
-      <form onSubmit={handleBidSubmit} className="bid-form">
-        <input
-          type="number"
-          placeholder="Your bid"
-          value={newBid}
-          onChange={(e) => setNewBid(Number(e.target.value))}
-          className="search-input"
-        />
-        <button type="submit" className="button">
-          Place Bid
-        </button>
-      </form>
+    <div className="container mt-5">
+      <div className="card p-4 shadow-sm">
+        <h2 className="text-center">{auction.item}</h2>
+        <p className="text-muted">{auction.description}</p>
+        <p className="fw-bold">Current Price: <span className="text-primary">${auction.currentPrice}</span></p>
+        <p className="text-danger">Time Remaining: {formatTime(timeRemaining)}</p>
+
+        <form onSubmit={handleBidSubmit} className="mt-3">
+          <div className="input-group mb-3">
+            <input
+              type="number"
+              className="form-control"
+              placeholder="Enter your bid"
+              value={newBid}
+              onChange={(e) => setNewBid(Number(e.target.value))}
+              required
+            />
+            <button type="submit" className="btn btn-success">
+              Place Bid
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 };

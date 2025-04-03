@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import '../App.css';
+import 'bootstrap/dist/css/bootstrap.min.css';
 const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -15,7 +14,7 @@ const Register: React.FC = () => {
     if (username && email && password) {
       try {
         // Make the POST request to the backend register endpoint
-        const response = await fetch(`http://localhost:8080/register`, {
+        const response = await fetch(`${backendUrl}/register`, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -44,44 +43,43 @@ const Register: React.FC = () => {
   };
 
   return (
-    <div className="register card">
-      <h2>Register</h2>
-      <form onSubmit={handleRegister}>
-        <label>
-          Username:
-          <input
-            type="text"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-            required
-            className="search-input"
-          />
-        </label>
-        <br />
-        <label>
-          Email:
-          <input
-            type="email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-            className="search-input"
-          />
-        </label>
-        <br />
-        <label>
-          Password:
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="search-input"
-          />
-        </label>
-        <br />
-        <button type="submit" className="button">Register</button>
-      </form>
+    <div className="container d-flex justify-content-center align-items-center min-vh-100">
+      <div className="card p-4 shadow-sm" style={{ maxWidth: '400px', width: '100%' }}>
+        <h2 className="text-center mb-4">Register</h2>
+        <form onSubmit={handleRegister}>
+          <div className="mb-3">
+            <label className="form-label">Username</label>
+            <input
+              type="text"
+              className="form-control"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Email</label>
+            <input
+              type="email"
+              className="form-control"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </div>
+          <div className="mb-3">
+            <label className="form-label">Password</label>
+            <input
+              type="password"
+              className="form-control"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <button type="submit" className="btn btn-primary w-100">Register</button>
+        </form>
+      </div>
     </div>
   );
 };
