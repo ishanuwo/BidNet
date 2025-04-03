@@ -3,6 +3,7 @@ import '../App.css';
 
 const CreateAuction: React.FC = () => {
   const [itemName, setItemName] = useState('');
+  const [description, setDescription] = useState('');
   const [startPrice, setStartPrice] = useState<number | string>('');
   const [image, setImage] = useState<File | null>(null);
   const [preview, setPreview] = useState<string>('');
@@ -15,15 +16,43 @@ const CreateAuction: React.FC = () => {
     }
   };
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!itemName || !startPrice) {
+
+    if (!itemName || !description || !startPrice) {
       alert('Please fill in all required fields.');
       return;
     }
-    // Simulate API call to create an auction
-    console.log("Creating auction:", { itemName, startPrice, image });
-    alert('Auction created successfully!');
+
+    // For now, just send text data as JSON. (We'll skip the image.)
+    const data = {
+      name: itemName,
+      description,
+      startPrice
+      // If you want to handle images, you can do multi-part form data or a second endpoint.
+    };
+
+    try {
+      const res = await fetch('http://localhost:4000/api/auction/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+
+      if (!res.ok) {
+        const errorText = await res.text();
+        throw new Error(`Error creating auction: ${errorText}`);
+      }
+
+      alert('Auction created successfully!');
+      setItemName('');
+      setDescription('');
+      setStartPrice('');
+      setImage(null);
+      setPreview('');
+    } catch (err: any) {
+      alert(err.message);
+    }
   };
 
   return (
@@ -41,6 +70,18 @@ const CreateAuction: React.FC = () => {
           />
         </label>
         <br />
+
+        <label>
+          Description:
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+            className="search-input"
+          />
+        </label>
+        <br />
+
         <label>
           Starting Price:
           <input
@@ -52,8 +93,9 @@ const CreateAuction: React.FC = () => {
           />
         </label>
         <br />
+
         <label>
-          Upload Image:
+          Upload Image (optional):
           <input
             type="file"
             accept="image/*"
@@ -61,12 +103,14 @@ const CreateAuction: React.FC = () => {
             className="search-input"
           />
         </label>
+
         {preview && (
           <div className="image-preview">
             <img src={preview} alt="Preview" />
           </div>
         )}
         <br />
+
         <button type="submit" className="button">
           Create Auction
         </button>
