@@ -1,6 +1,6 @@
 import React, { useState, FormEvent } from 'react';
 import '../App.css';
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 const CreateAuction: React.FC = () => {
   const [itemName, setItemName] = useState('');
   const [description, setDescription] = useState('');
@@ -31,7 +31,7 @@ const CreateAuction: React.FC = () => {
 
 
     try {
-      const res = await fetch('http://localhost:8080/create_auction', {
+      const res = await fetch(`${backendUrl}/create_auction`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'

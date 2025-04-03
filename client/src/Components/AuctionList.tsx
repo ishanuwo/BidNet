@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import '../App.css';
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 interface Auction {
   id: number;
   item: string;
@@ -13,10 +13,11 @@ const AuctionList: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
+    console.log(import.meta.env);
     // Fetch data from the server
     const fetchAuctions = async () => {
       try {
-        const response = await fetch('http://localhost:8080/get_all_items');
+        const response = await fetch(`${backendUrl}/get_all_items`);
         if (!response.ok) {
           throw new Error('Failed to fetch auctions');
         }

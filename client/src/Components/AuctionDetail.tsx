@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import '../App.css';
-
+const backendUrl = import.meta.env.VITE_BACKEND_URL;
 interface Auction {
   id: string;
   item: string;
@@ -21,7 +21,7 @@ const AuctionDetail: React.FC = () => {
   useEffect(() => {
     const fetchAuction = async () => {
       try {
-        const response = await fetch(`http://localhost:8080/get_auction_details/${id}`);
+        const response = await fetch(`${backendUrl}/get_auction_details/${id}`);
         if (!response.ok) {
           throw new Error('Failed to fetch auction details');
         }
