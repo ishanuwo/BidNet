@@ -1,8 +1,16 @@
 INSIDE THE SERVER FOLDER
 
+Mac:
 mkdir build
 cd build
 cmake ..
 make
 ./server
 
+For Windows:
+Install CMAKE from here:https://cmake.org/download/
+mkdir build
+cd build
+cmake ..
+Install Boost from here:https://www.boost.org/users/download/
+cmake -DBOOST_ROOT="C:/path/to/boost" ..
